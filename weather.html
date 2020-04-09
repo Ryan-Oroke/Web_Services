@@ -117,6 +117,8 @@
     var dayOfWeek = "";
     var lat = 40.0150;
     var lon = -105.2705;
+    var url ="";
+
     function formatDate(date, month, year)
     {
       month = (month.length < 2) ? ('0' + month) : month;
@@ -133,29 +135,33 @@
       return (9 * temp / 5) + 32;
     }
 
+    //Got this to run but could not update coordinates or URL for some reason
     function updateCoords(){
+      //alert("Reading data");
       var newLat = document.getElementById("locationInput").elements[0].value;
-      var newLon = document.getElementById("locationInput").elements[0].value;
-      console.log(newLat);
+      var newLon = document.getElementById("locationInput").elements[1].value;
+      //console.log(newLat + ','+ newLon);
       if(newLat >= -90 && newLat <= 90 && newLon >= -180 && newLon <= 180){
         lat = newLat;
         lon = newLon;
-        $(document).ready(loadData());
+        //alert("Successfulentry" + lat + ','+ lon)
+        $(document).ready(loadData(newLat, newLon));
       } else {
         alert("Invalid Coordinates! Please try again.");
       }
     }
     //run when the document object model is ready for javascript code to execute
-    $(document).ready(loadData())
+    $(document).ready(loadData(lat, lon))
 
-    function loadData()
+    function loadData(latit, longit)
     {
+      //alert(latit);
       console.log(lat, lon);
-      var url = 'https://api.weatherstack.com/forecast?access_key=5bc82451636190abd9d7afe6fe9b20b5&query=' + lat + ',' + lon + '&forecast_days=6'; //Place your weatherstack API Call Here - access_key to be used: 5bc82451636190abd9d7afe6fe9b20b5
-
-      $.ajax({ url: url, dataType: "jsonp" }).then(function (data)
+      url = 'https://api.weatherstack.com/forecast?access_key=5bc82451636190abd9d7afe6fe9b20b5&query=' + latit + ',' + longit + '&forecast_days=6'; //Place your weatherstack API Call Here - access_key to be used: 5bc82451636190abd9d7afe6fe9b20b5
+      $.ajax({ url: url, ajaxLat: latit, ajaxLon: longit, dataType: "jsonp" }).then(function (data)
       {
         console.log(data);
+        //alert(`Working for: ${latit}, ${longit}`)
         /* console.log("Current Temp: " + data.current.temperature);
         var current_time = data.location.localtime;
         console.log(current_time.getDay()); */
@@ -183,7 +189,7 @@
         }
 
         //5
-        $('#precip_today').html(data.current.precip + "units");
+        $('#precip_today').html(data.current.precip + "%");
 
         //6
         $('#humidity_today').html(data.current.humidity + "%");
@@ -254,7 +260,7 @@
             str = str + dayStr;
         }
 
-        console.log(str);
+        //console.log(str);
         $('#5_day_forecast').html(str);
 
         /*
